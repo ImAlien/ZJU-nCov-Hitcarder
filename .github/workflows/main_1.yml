@@ -1,4 +1,4 @@
-name: ZJU-nCov-Hitcarder
+name: ZJU-nCov-Hitcarder_1
 
 on:
   workflow_dispatch:
