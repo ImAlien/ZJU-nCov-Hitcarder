@@ -1,0 +1,30 @@
+name: ZJU-nCov-Hitcarder
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * *"
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - username: ZJU_USERNAME_1
+            password: ZJU_PASSWORD_1
+            dingtalk_token: DINGTALK_TOKEN
+            pushplus_token: PUSHPLUS_TOKEN
+            serverchan_key: SERVERCHAN_KEY
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Working
+        uses: GuodongQi/ZJU-nCov-Hitcarder@master
+        with:
+          username: ${{ secrets[matrix.username] }}
+          password: ${{ secrets[matrix.password] }}
+          dingtalk_token: ${{ secrets[matrix.dingtalk_token] }}
+          pushplus_token: ${{ secrets[matrix.pushplus_token] }}
+          serverchan_key: ${{ secrets[matrix.serverchan_key] }}
