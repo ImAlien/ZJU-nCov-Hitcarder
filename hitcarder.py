@@ -9,6 +9,7 @@ import datetime
 import os
 import sys
 import message
+import ddddocr
 
 
 class HitCarder(object):
@@ -29,12 +30,14 @@ class HitCarder(object):
         self.login_url = "https://zjuam.zju.edu.cn/cas/login?service=https%3A%2F%2Fhealthreport.zju.edu.cn%2Fa_zju%2Fapi%2Fsso%2Findex%3Fredirect%3Dhttps%253A%252F%252Fhealthreport.zju.edu.cn%252Fncov%252Fwap%252Fdefault%252Findex"
         self.base_url = "https://healthreport.zju.edu.cn/ncov/wap/default/index"
         self.save_url = "https://healthreport.zju.edu.cn/ncov/wap/default/save"
+        self.code_url = 'https://healthreport.zju.edu.cn/ncov/wap/default/code'
         self.sess = requests.Session()
         self.sess.keep_alive = False
         retry = Retry(connect=3, backoff_factor=0.5)
         adapter = HTTPAdapter(max_retries=retry)
         self.sess.mount('http://', adapter)
         self.sess.mount('https://', adapter)
+        self.ocr = ddddocr.DdddOcr()
         # ua = UserAgent()
         # self.sess.headers['User-Agent'] = ua.chrome
         self.sess.headers = {
@@ -93,7 +96,11 @@ class HitCarder(object):
         # with open("form.txt", "w", encoding="utf-8") as f:
         #     f.write(new_form)
         return False
-
+    def get_verifyCode(self):
+        resp = self.sess.get(self.code_url)
+        verifyCode = self.ocr.classification(resp.content)
+        print("验证码：", verifyCode)
+        return verifyCode
     def get_info(self, html=None):
         """Get hit card info, which is the old info with updated new time."""
         if not html:
@@ -135,6 +142,7 @@ class HitCarder(object):
         new_info['sfzx'] = old_info['sfzx'] # 在校
         new_info['sfymqjczrj'] = old_info['sfymqjczrj'] # 入境
         new_info['sfqrxxss'] = 1 # 属实
+        new_info['verifyCode'] = self.get_verifyCode()
 
         self.info = new_info
         # print(json.dumps(self.info))
@@ -185,12 +193,12 @@ def main(username, password):
     except Exception as err:
         return 1, '打卡登录失败：' + str(err)
 
-    try:
-        ret = hit_carder.check_form()
-        if not ret:
-            return 2, '打卡信息已改变，请手动打卡'
-    except Exception as err:
-        return 1, '获取信息失败，请手动打卡: ' + str(err)
+    # try:
+    #     ret = hit_carder.check_form()
+    #     if not ret:
+    #         return 2, '打卡信息已改变，请手动打卡'
+    # except Exception as err:
+    #     return 1, '获取信息失败，请手动打卡: ' + str(err)
 
     try:
         hit_carder.get_info()
@@ -204,6 +212,10 @@ def main(username, password):
             return 0, '打卡成功'
         elif str(res['m']) == '今天已经填报了':
             return 0, '今天已经打卡'
+        elif res['m'].find("验证码错误") != -1:  # 验证码错误
+            print('再次尝试')
+            time.sleep(5)
+            return main(username, password)
         else:
             return 1, '打卡失败'
     except:
