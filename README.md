@@ -22,4 +22,4 @@ forked from [Tishacy/ZJU-nCov-Hitcarder](https://github.com/Tishacy/ZJU-nCov-Hit
 
 # Sample Repository
 
-https://github.com/Long0x0/ZJU-nCov-Hitcarder-Sample
+https://github.com/ImAlien/ZJU-nCov-Hitcarder-Sample
