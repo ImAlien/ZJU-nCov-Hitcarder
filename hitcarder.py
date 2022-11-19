@@ -9,7 +9,7 @@ import datetime
 import os
 import sys
 import message
-import ddddocr
+#import ddddocr
 
 
 class HitCarder(object):
@@ -37,7 +37,7 @@ class HitCarder(object):
         adapter = HTTPAdapter(max_retries=retry)
         self.sess.mount('http://', adapter)
         self.sess.mount('https://', adapter)
-        self.ocr = ddddocr.DdddOcr()
+        #self.ocr = ddddocr.DdddOcr()
         # ua = UserAgent()
         # self.sess.headers['User-Agent'] = ua.chrome
         self.sess.headers = {
@@ -142,7 +142,7 @@ class HitCarder(object):
         new_info['sfzx'] = old_info['sfzx'] # 在校
         new_info['sfymqjczrj'] = old_info['sfymqjczrj'] # 入境
         new_info['sfqrxxss'] = 1 # 属实
-        new_info['internship'] = 1 #否
+        new_info['internship'] = 1 #实习否
         #new_info['verifyCode'] = self.get_verifyCode()
 
         self.info = new_info
@@ -224,8 +224,10 @@ def main(username, password):
 
 
 if __name__ == "__main__":
-    username = os.environ['USERNAME']
-    password = os.environ['PASSWORD']
+    # username = os.environ['USERNAME']
+    # password = os.environ['PASSWORD']
+    username = '22121216'
+    password = '577068566zju'
 
     ret, msg = main(username, password)
     print(ret, msg)
